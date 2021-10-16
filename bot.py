@@ -2,6 +2,7 @@ import vk_api
 import vk_api.utils
 from vk_api.bot_longpoll import VkBotLongPoll
 import settings
+from database.create_db import connect_and_fill_db
 
 
 class VkBot:
@@ -13,11 +14,14 @@ class VkBot:
         self.poll = VkBotLongPoll(self.api, self.group_id)
         self.vk_sess = self.api.get_api()
 
+
     def run(self):
-        """Start bot."""
+        """Start bot"""
+        connect_and_fill_db()
         for event in self.poll.listen():
-            self.event_handling(event)
+            print('11')
 
 
 if __name__ == '__main__':
     bot = VkBot(token=settings.TOKEN, group_id=settings.GROUP_ID)
+    bot.run()
