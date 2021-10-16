@@ -10,16 +10,26 @@ class VkBot:
     def __init__(self, token, group_id):
         self.token = token
         self.group_id = group_id
-        self.api = vk_api.VkApi(token=token)
-        self.poll = VkBotLongPoll(self.api, self.group_id)
+        self.api = vk_api.VkApi(token=self.token)
+        self.poller = VkBotLongPoll(self.api, self.group_id)
         self.vk_sess = self.api.get_api()
+        self.message_receiver = None  # прием сообщений
+        self.message_handler = None  # обработка сообщений
+        self.message_sender = None  # отправка сообщений
 
 
     def run(self):
         """Start bot"""
         connect_and_fill_db()
-        for event in self.poll.listen():
-            print('11')
+        print('run')
+        for event in self.poller.listen():
+            print(event)
+            message = event.object.message
+            user_id = str(message['from_id'])
+            message_text = message['text']
+            self.vk_sess.messages.send(user_id=user_id,
+                                       message=message_text,
+                                       random_id=vk_api.utils.get_random_id())
 
 
 if __name__ == '__main__':
