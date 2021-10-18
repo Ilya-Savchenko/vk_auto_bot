@@ -17,7 +17,6 @@ class VkBot:
         self.api = vk_api.VkApi(token=self.token)
         self.poller = VkBotLongPoll(self.api, self.group_id)
         self.vk_sess = self.api.get_api()
-        self.categories = None
         self.msg_handler = MessageHandler()  # обработка сообщений
         self.message_sender = None  # отправка сообщений
 
@@ -25,8 +24,6 @@ class VkBot:
         """Start bot"""
         connect_and_fill_db()
         print(states.generate_tokens_for_state1())
-        self.categories = [category.name for category in Section.select()]
-        print(self.categories)
         print('run')
         for event in self.poller.listen():
             self.event_handler(event)
@@ -53,8 +50,7 @@ class VkBot:
         text = handler(msg=msg, user_id=user_id)
         self.send_text_message(user_id, text)
         print('start')
-        # for i in range(len(self.categories)):
-        #     text += f'\n{i + 1}. {self.categories[i]}'
+
 
 
     def _continue(self, user_id, msg):
