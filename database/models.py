@@ -9,13 +9,13 @@ class BaseModel(peewee.Model):
 
 
 class Section(BaseModel):
-    name = peewee.CharField()
+    name = peewee.CharField(unique=True)
 
     class Meta:
         db_table = 'sections'
 
 class Good(BaseModel):
-    name = peewee.CharField()
+    name = peewee.CharField(unique=True)
     price = peewee.DecimalField()
     description = peewee.TextField()
     image = peewee.CharField()
@@ -25,8 +25,8 @@ class Good(BaseModel):
         db_table = 'goods'
 
 class UserState(BaseModel):
-    user_id = peewee.BigIntegerField()
-    state = peewee.CharField(max_length=5)
+    user_id = peewee.BigIntegerField(unique=True)
+    state = peewee.CharField(max_length=10)
 
     class Meta:
         db_table = 'userstates'
