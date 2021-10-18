@@ -5,6 +5,7 @@ class MessageHandler:
 
     def __init__(self):
         self.state1_tokens = []
+        self.categories = None
 
     def state0_msg_handler(self, msg, user_id):
         state = states.STATES.get('first_state')
@@ -12,6 +13,7 @@ class MessageHandler:
         next_state = all_states.get(state).get('next_state')
         if msg.lower() == all_states.get(state).get('tokens'):
             text = all_states.get(next_state).get('text')
+            text += self.generate_categories_list()
             UserState.create(user_id=user_id, state=next_state)
         else:
             text = all_states.get(state).get('error_text')
@@ -44,3 +46,9 @@ class MessageHandler:
     def _generate_tokens_for_state1(self):
         number_of_sections = len(list(Section.select()))
         return list(range(1, number_of_sections + 1))
+    def generate_categories_list(self):
+        self.categories = [category.name for category in Section.select()]
+        text = ''
+        for i in range(len(self.categories)):
+            text += f'\n{i + 1}. {self.categories[i]}'
+        return text

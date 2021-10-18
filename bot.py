@@ -18,7 +18,6 @@ class VkBot:
         self.api = vk_api.VkApi(token=self.token)
         self.poller = VkBotLongPoll(self.api, self.group_id)
         self.vk_sess = self.api.get_api()
-        self.categories = None
         self.msg_handler = MessageHandler()  # обработка сообщений
         self.message_sender = None  # отправка сообщений
 
@@ -43,20 +42,19 @@ class VkBot:
 
             query = UserState.select().where(UserState.user_id == user_id)
             if not query.exists():
-                self._start(msg=message_text, user_id=user_id)
+                self._start(msg=message_text, user_id=user_id, msg=message_text)
             else:
                 self._continue(msg=message_text, user_id=user_id)
 
 
-    def _start(self, msg, user_id):
+    def _start(self, user_id, msg):
         state = states.STATES.get('first_state')
         handler_name = states.STATES.get('states').get(state).get('handler')
         handler = getattr(self.msg_handler, handler_name)
         text = handler(msg=msg, user_id=user_id)
         self.send_text_message(user_id, text)
         print('start')
-        # for i in range(len(self.categories)):
-        #     text += f'\n{i + 1}. {self.categories[i]}'
+
 
 
     def _continue(self, msg, user_id):
@@ -82,16 +80,7 @@ class VkBot:
     def send_text_message(self, user_id, msg):
         self.vk_sess.messages.send(user_id=user_id, message=msg, random_id=vk_api.utils.get_random_id())
 
-    def _send_image_message(self, from_id, image):
-        upload_url = self.vk_sess.photos.getMessagesUploadServer()['upload_url']
-        upload_data = requests.post(upload_url, files={'photo': ('image.png', image, 'image/png')}).json()
-        image_data = self.vk_sess.photos.saveMessagesPhoto(**upload_data)
-        owner_id = image_data[0]['owner_id']
-        media_id = image_data[0]['id']
-        attachment = f'photo{owner_id}_{media_id}'
-        self.vk_sess.messages.send(user_id=from_id,
-                                   attachment=attachment,
-                                   random_id=vk_api.utils.get_random_id())
+
 
 
 if __name__ == '__main__':

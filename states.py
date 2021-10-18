@@ -1,5 +1,3 @@
-from database.models import Section
-
 STATES = {
     'first_state': 'state0',
     'states': {
@@ -29,3 +27,5 @@ STATES = {
         },
     }
 }
+
+
