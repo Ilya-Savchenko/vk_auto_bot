@@ -13,7 +13,7 @@ STATES = {
         },
         'state1': {
             'text': 'Выберите нужную категорию цифрой',
-            'tokens': 'generate_tokens_for_state1',
+            'tokens': 'generate_tokens_for_state1',  # in message handler
             'error_text': 'Неправильный ввод, нет такого ответа',
             'handler': 'state1_msg_handler',
             'next_state': 'state2',
@@ -29,10 +29,3 @@ STATES = {
         },
     }
 }
-
-HELLO_ANSWER = ''
-
-
-def generate_tokens_for_state1():
-    number_of_sections = len(list(Section.select()))
-    return list(range(1, number_of_sections + 1))
