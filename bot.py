@@ -42,7 +42,7 @@ class VkBot:
 
             query = UserState.select().where(UserState.user_id == user_id)
             if not query.exists():
-                self._start(msg=message_text, user_id=user_id, msg=message_text)
+                self._start(msg=message_text, user_id=user_id)
             else:
                 self._continue(msg=message_text, user_id=user_id)
 
