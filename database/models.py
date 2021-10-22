@@ -27,6 +27,7 @@ class Good(BaseModel):
 class UserState(BaseModel):
     user_id = peewee.BigIntegerField(unique=True)
     state = peewee.CharField(max_length=10)
+    good_id = peewee.IntegerField(null=True)
 
     class Meta:
         db_table = 'userstates'

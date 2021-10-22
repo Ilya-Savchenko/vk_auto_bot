@@ -22,8 +22,16 @@ STATES = {
             'tokens': ('далее', 'назад', 'в меню', 'заказать'),
             'error_text': 'Неправильный ввод, нет такого ответа',
             'handler': 'state2_msg_handler',
-            'next_state': None,
+            'next_state': 'state3',
             'previous_state': 'state1'
+        },
+        'state3': {
+            'text': 'Заявка создана, с Вами свяжется менеджер для уточнения заказа',
+            'tokens': '',
+            'error_text': 'Неправильный ввод, такого ответа нет',
+            'handler': 'state3_msg_handler',
+            'next_state': None,
+            'previous_state': 'state2'
         },
     }
 }

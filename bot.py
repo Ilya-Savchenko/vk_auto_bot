@@ -56,10 +56,9 @@ class VkBot:
         print('start')
 
 
-
     def _continue(self, msg, user_id):
         state = UserState.get(UserState.user_id == user_id).state
-        print(f'{state}ksdfnldskanf')
+        print(f'{state} ---')
         handler_name = states.STATES.get('states').get(state).get('handler')
         handler = getattr(self.msg_handler, handler_name)
         text = handler(msg=msg, user_id=user_id)
