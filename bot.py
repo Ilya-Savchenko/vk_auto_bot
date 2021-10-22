@@ -24,10 +24,7 @@ class VkBot:
     def run(self):
         """Start bot"""
         connect_and_fill_db()
-        a = self.msg_handler._generate_tokens_for_state1()
-        print(a)
         self.categories = [category.name for category in Section.select()]
-        print(self.categories)
         print('run')
         for event in self.poller.listen():
             self.event_handler(event)
@@ -53,18 +50,17 @@ class VkBot:
         handler = getattr(self.msg_handler, handler_name)
         text = handler(msg=msg, user_id=user_id)
         self.send_text_message(user_id, text)
-        print('start')
 
 
 
     def _continue(self, msg, user_id):
         state = UserState.get(UserState.user_id == user_id).state
-        print(f'{state}ksdfnldskanf')
         handler_name = states.STATES.get('states').get(state).get('handler')
         handler = getattr(self.msg_handler, handler_name)
-        text = handler(msg=msg, user_id=user_id)
+        text, image = handler(msg=msg, user_id=user_id)
+        if image:
+            self.send_image_message(user_id, image)
         self.send_text_message(user_id, text)
-        print('continue')
         # self.msg_handler.state1_msg_handler(msg=msg, user_id=user_id)
         # all_states = states.STATES.get('states')
         # next_state = all_states.get(state).get('next_state')
@@ -80,7 +76,25 @@ class VkBot:
     def send_text_message(self, user_id, msg):
         self.vk_sess.messages.send(user_id=user_id, message=msg, random_id=vk_api.utils.get_random_id())
 
+    def send_image_message(self, user_id, image):
+        upload = vk_api.upload.VkUpload(self.api)
+        img = upload.photo_messages(image)
+        owner_id = img[0]['owner_id']
+        media_id = img[0]['id']
+        # access_key = img[0]['access_key']
+        # attachment = f'photo{owner_id}_{media_id}_{access_key}'
+        attachment = f'photo{owner_id}_{media_id}'
+        self.vk_sess.messages.send(user_id=user_id, attachment=attachment, random_id=vk_api.utils.get_random_id())
 
+        # upload_url = self.vk_sess.photos.getMessagesUploadServer().get('upload_url')
+        # print(upload_url)
+        # upload_data = requests.post(upload_url, files={'photo': ('image.jpg', image, 'image/jpeg')}).json()
+        # print(upload_data)
+        # image_data = self.vk_sess.photos.saveMessagesPhoto(**upload_data)
+        #
+        # owner_id = image_data[0]['owner_id']
+        # media_id = image_data[0]['id']
+        # self.vk_sess.messages.send(user_id=user_id, attachment=attachment, random_id=vk_api.utils.get_random_id())
 
 
 if __name__ == '__main__':
