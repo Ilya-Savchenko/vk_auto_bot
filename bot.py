@@ -23,7 +23,6 @@ class VkBot:
     def run(self):
         """Start bot"""
         connect_and_fill_db()
-        self.categories = [category.name for category in Section.select()]
         print('run')
         for event in self.poller.listen():
             self.event_handler(event)
