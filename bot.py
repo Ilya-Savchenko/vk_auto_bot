@@ -3,8 +3,8 @@ import vk_api
 import vk_api.utils
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 
-import settings
 import states
+import settings
 from database.create_db import connect_and_fill_db
 from database.models import UserState, Section
 from message_handler import MessageHandler

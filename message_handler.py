@@ -22,34 +22,34 @@ class MessageHandler:
     def state1_msg_handler(self, msg, user_id):
         image = None
         user = UserState.get(UserState.user_id == user_id)
-        print(f'{user.state}!!!!!!!!!!!!!!!')
         self.state1_tokens = [str(el) for el in self._generate_tokens_for_state1()]
-        print(self.categories)
         state = user.state
-        print(state)
         all_states = states.STATES.get('states')
         next_state = all_states.get(state).get('next_state')
-        print(next_state)
         if msg.lower() in self.state1_tokens:
-            print(f'message {msg.lower()}')
             category_name = self.categories.get(int(msg.lower()))
-            print(f'cn {category_name}')
             category = Section.get(Section.name == category_name)
-            print(f'category  {category.name} -- {category.id}')
             goods_in_section = Good.select().where(Good.section == category.id)
             good = goods_in_section[0]
             user.good_id = good.id
-            text = self.create_msg_with_product_info(good.id)
-            text += all_states.get(next_state).get('text')
+            text = self.create_reply_msg(all_states, good, next_state)
             image = good.image
-            print(image)
-            user.state = next_state
-            user.save()
+            self.save_user_state(next_state, user)
         else:
             text = all_states.get(state).get('error_text')
         return text, image
 
+    def create_reply_msg(self, all_states, good, next_state):
+        text = self.create_msg_with_product_info(good.id)
+        text += all_states.get(next_state).get('text')
+        return text
+
+    def save_user_state(self, state, user):
+        user.state = state
+        user.save()
+
     def state2_msg_handler(self, msg, user_id):
+        image = None
         user = UserState.get(UserState.user_id == user_id)
         print(f'{user.state}!!!!!!!!!!!!!!!')
         state = user.state
@@ -58,22 +58,20 @@ class MessageHandler:
         if msg.lower() in all_states.get(state).get('tokens'):
             if msg.lower() == 'далее':
                 # следующий товар
-                pass
+                text = '->'
             elif msg.lower() == 'назад':
                 # предыдущий товар
-                pass
+                text = '<-'
             elif msg.lower() == 'в меню':
                 # вернуться на предыдущий этап
-                pass
+                text = '<--'
             elif msg.lower() == 'заказать':
                 # заказ
-                pass
-            if next_state:
-                user.state = next_state
-                user.save()
+                text = all_states.get(next_state).get('text')
+                self.save_user_state(next_state, user)
         else:
             text = all_states.get(state).get('error_text')
-        return text
+        return text, image
 
 
     def state3_msg_handler(self):
