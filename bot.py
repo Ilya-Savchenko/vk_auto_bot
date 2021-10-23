@@ -1,4 +1,3 @@
-import requests
 import vk_api
 import vk_api.utils
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
@@ -6,7 +5,7 @@ from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 import states
 import settings
 from database.create_db import connect_and_fill_db
-from database.models import UserState, Section
+from database.models import UserState
 from message_handler import MessageHandler
 
 
@@ -18,8 +17,7 @@ class VkBot:
         self.api = vk_api.VkApi(token=self.token)
         self.poller = VkBotLongPoll(self.api, self.group_id)
         self.vk_sess = self.api.get_api()
-        self.msg_handler = MessageHandler()  # обработка сообщений
-        self.message_sender = None  # отправка сообщений
+        self.msg_handler = MessageHandler()
 
     def run(self):
         """Start bot"""
@@ -45,20 +43,25 @@ class VkBot:
         state = states.STATES.get('first_state')
         handler_name = states.STATES.get('states').get(state).get('handler')
         handler = getattr(self.msg_handler, handler_name)
-        text = handler(msg=msg, user_id=user_id)
-        self.send_text_message(user_id, text)
+        text, keyboard = handler(msg=msg, user_id=user_id)
+        self.send_text_message(user_id, text, keyboard)
 
     def _continue(self, msg, user_id):
         state = UserState.get(UserState.user_id == user_id).state
         handler_name = states.STATES.get('states').get(state).get('handler')
         handler = getattr(self.msg_handler, handler_name)
-        text, image = handler(msg=msg, user_id=user_id)
+        text, image, keyboard = handler(msg=msg, user_id=user_id)
         if image:
             self.send_image_message(user_id, image)
-        self.send_text_message(user_id, text)
+        self.send_text_message(user_id, text, keyboard)
 
-    def send_text_message(self, user_id, msg):
-        self.vk_sess.messages.send(user_id=user_id, message=msg, random_id=vk_api.utils.get_random_id())
+    def send_text_message(self, user_id, msg, keyboard=None):
+        if not keyboard:
+            self.vk_sess.messages.send(user_id=user_id, message=msg, random_id=vk_api.utils.get_random_id())
+        else:
+            self.vk_sess.messages.send(
+                user_id=user_id, message=msg, random_id=vk_api.utils.get_random_id(), keyboard=keyboard.get_keyboard()
+            )
 
     def send_image_message(self, user_id, image):
         upload = vk_api.upload.VkUpload(self.api)

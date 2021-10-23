@@ -1,11 +1,14 @@
 from database.models import Good, Section, UserState
 import states
+from keyboard_generator import KeyboardGenerator
+
 
 class MessageHandler:
 
     def __init__(self):
         self.state1_tokens = []
         self.categories = {}
+        self.keyboard = KeyboardGenerator()
 
     def state0_msg_handler(self, msg, user_id):
         state = states.STATES.get('first_state')
@@ -14,10 +17,12 @@ class MessageHandler:
         if msg.lower() == all_states.get(state).get('tokens'):
             text = all_states.get(next_state).get('text')
             text += self.generate_categories_list()
+            keyboard = self.keyboard.generate_keyboard(self.generate_tokens_for_state1())
             UserState.create(user_id=user_id, state=next_state)
         else:
             text = all_states.get(state).get('error_text')
-        return text
+            keyboard = self.keyboard.generate_keyboard(['Начать'])
+        return text, keyboard
 
     def state1_msg_handler(self, msg, user_id):
         image = None
@@ -35,9 +40,12 @@ class MessageHandler:
             text = self.create_reply_msg(all_states, good, next_state)
             image = good.image
             self.save_user_state(next_state, user)
+            print(next_state)
+            keyboard = self.keyboard.generate_keyboard(all_states.get(next_state).get('tokens'))
         else:
             text = all_states.get(state).get('error_text')
-        return text, image
+            keyboard = self.keyboard.generate_keyboard(self.generate_tokens_for_state1())
+        return text, image, keyboard
 
     def state2_msg_handler(self, msg, user_id):
         image = None
@@ -48,21 +56,26 @@ class MessageHandler:
         if msg.lower() in all_states.get(state).get('tokens'):
             if msg.lower() == 'далее':
                 image, text = self.next_good(all_states, image, state, user)
+                keyboard = self.keyboard.generate_keyboard(all_states.get(state).get('tokens'))
             elif msg.lower() == 'назад':
                 image, text = self.previous_good(all_states, image, state, user)
+                keyboard = self.keyboard.generate_keyboard(all_states.get(state).get('tokens'))
             elif msg.lower() == 'в меню':
                 previous_state = all_states.get(state).get('previous_state')
                 text = all_states.get(previous_state).get('text')
                 text += self.generate_categories_list()
+                keyboard = self.keyboard.generate_keyboard(self.generate_tokens_for_state1())
                 self.save_user_state(previous_state, user)
             elif msg.lower() == 'заказать':
                 text = all_states.get(next_state).get('text')
-                self.delelte_user_instance(user_id)
+                self.delete_user_instance(user_id)
+                keyboard = self.keyboard.generate_keyboard(['Начать'])
         else:
             text = all_states.get(state).get('error_text')
-        return text, image
+            keyboard = self.keyboard.generate_keyboard(all_states.get(state).get('tokens'))
+        return text, image, keyboard
 
-    def delelte_user_instance(self, user_id):
+    def delete_user_instance(self, user_id):
         user = UserState.get(UserState.user_id == user_id)
         user.delete_instance()
 
