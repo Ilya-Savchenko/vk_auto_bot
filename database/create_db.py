@@ -77,7 +77,6 @@ def fill_goods():
     )
 
 
-
 def fill_db():
     fill_sections()
     fill_goods()

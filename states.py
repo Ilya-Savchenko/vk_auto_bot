@@ -1,7 +1,7 @@
 STATES = {
     'first_state': 'state0',
     'states': {
-        'state0':{
+        'state0': {
             'text': 'Для старта работы напишите мне "Начать"',
             'tokens': 'начать',
             'error_text': 'Для старта работы напишите мне "Начать"',
@@ -10,8 +10,8 @@ STATES = {
             'previous_state': None
         },
         'state1': {
-            'text': 'Выберите нужную категорию цифрой',
-            'tokens': 'generate_tokens_for_state1',  # in message handler
+            'text': 'Выберите нужную категорию',
+            'tokens': 'generate_tokens_for_state1',
             'error_text': 'Неправильный ввод, нет такого ответа',
             'handler': 'state1_msg_handler',
             'next_state': 'state2',
@@ -36,5 +36,3 @@ STATES = {
         },
     }
 }
-
-

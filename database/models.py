@@ -14,6 +14,7 @@ class Section(BaseModel):
     class Meta:
         db_table = 'sections'
 
+
 class Good(BaseModel):
     name = peewee.CharField(unique=True)
     price = peewee.DecimalField()
@@ -23,6 +24,7 @@ class Good(BaseModel):
 
     class Meta:
         db_table = 'goods'
+
 
 class UserState(BaseModel):
     user_id = peewee.BigIntegerField(unique=True)

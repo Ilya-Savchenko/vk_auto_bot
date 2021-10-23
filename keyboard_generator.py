@@ -19,5 +19,3 @@ class KeyboardGenerator:
             else:
                 keyboard.add_button(elem, self.colors.PRIMARY)
         return keyboard
-
-
