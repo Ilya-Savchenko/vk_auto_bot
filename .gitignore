@@ -1,2 +1,5 @@
 # database
 *.sqlite3
+
+#settings
+settings.py
