@@ -7,7 +7,6 @@ class KeyboardGenerator:
         self.colors = VkKeyboardColor
 
     def generate_keyboard(self, buttons: list or tuple):
-        print(buttons)
         keyboard = VkKeyboard()
 
         for elem in buttons:
